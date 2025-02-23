@@ -516,7 +516,8 @@ void buzzer_multiple_beeps(int count, int duration_ms)
 }
 
 //Função a ser chamada no alarme do lembrete
-int64_t reminder_alarm_callback(alarm_id_t id, void *user_data) {
+int64_t reminder_alarm_callback(alarm_id_t id, void *user_data) 
+{
     //Soa o alarme
     gpio_put(pin_buzzer, true); // Liga o buzzer
     reminder_active = true;
@@ -526,10 +527,11 @@ int64_t reminder_alarm_callback(alarm_id_t id, void *user_data) {
     return 0; //Sem repetições
 }
 
-// Check and update the buzzer state
-void check_buzzer_state() {
+//Checa o estado do buzzer
+void check_buzzer_state() 
+{
     if (reminder_active && absolute_time_diff_us(buzzer_end_time, get_absolute_time()) <= 0) {
-        // Turn off the buzzer
+        //Desliga o buzzer
         gpio_put(pin_buzzer, false);
         reminder_active = false;
     }
@@ -913,7 +915,7 @@ restart:
                 bool sw_val = gpio_get(sw) == 0;
                 sleep_ms(250);
 
-                //Cenário em que o Joystick seja movido para cima
+                //Cenário em que o Joystick seja movido para cima, para garantir a circularidade
                 if(vrx_val > 3500)
                 {
                     if(atual == 1){
@@ -925,7 +927,7 @@ restart:
                     }
                 }
 
-                //Cenário em que o Joystick seja movido para baixo
+                //Cenário em que o Joystick seja movido para baixo, para garantir a circularidade
                 else if(vrx_val < 600)
                 {
                     if(atual == 1){
@@ -1203,7 +1205,7 @@ restart:
                                                 }
                                                 morse_buffer[morse_index] = '\0'; // Termina o buffer com nulo
 
-                                                last_press_time = to_ms_since_boot(get_absolute_time()); // Record last press time
+                                                last_press_time = to_ms_since_boot(get_absolute_time()); //Armazena o momento do último clique
                                             }
                                         }
                                 
@@ -1247,9 +1249,9 @@ restart:
 
                                             if (session_index + strlen(word_buffer) + 1 < 40) {
                                                 if (session_index > 0) {
-                                                    session_buffer[session_index++] = ' '; // Add a space between words
+                                                    session_buffer[session_index++] = ' '; // Adiciona um espaço entre as palavras
                                                 }
-                                                strcat(session_buffer, word_buffer); // Append the word to the session buffer
+                                                strcat(session_buffer, word_buffer); //Concatena a palavra ao buffer da sessão
                                                 session_index += strlen(word_buffer);
                                             } 
                                             
@@ -1516,25 +1518,22 @@ restart:
                     //Lembretes
                     else if(atual == 3)
                     {
-                        // Initialize the reminder timer
-                        //initialize_reminder_timer();
-
-                        // Set a new reminder
+                        //Tempo pro alarme
                         int minutes = 0, seconds = 0;
                         
-                        // Set the reminder time
+                        //Define o tempo pro alarme
                         set_reminder_time(&minutes, &seconds, &frame_area);
 
                         current_reminder.time_seconds = (minutes * 60) + seconds;
                         reminder_alarm_id = add_alarm_in_ms(current_reminder.time_seconds * 1000, reminder_alarm_callback, NULL, false);
 
-                        // zera o display
+                        //zera o display
                         uint8_t ssd[ssd1306_buffer_length];
                         memset(ssd, 0, ssd1306_buffer_length);
                         render_on_display(ssd, &frame_area);
 
                         char buffer[17];
-                        sprintf(buffer, "Toca em %02d:%02d\n", minutes, seconds); // Replace with LCD display code
+                        sprintf(buffer, "Toca em %02d:%02d\n", minutes, seconds);
                             
                         y = 16;
                         ssd1306_draw_string(ssd, 5, y, buffer);
